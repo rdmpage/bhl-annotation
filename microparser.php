@@ -369,6 +369,8 @@ function parse($text, $debug = false)
 		// Trans. Acad. Sci. St. Louis xiv. 190.
 		'/^' . '(?<journal>([A-Z][a-z]+\.?\s*)+)\s+(?<volume>([ivxlcIVXLC]+)\.)\s+(?<collation>(?<page>\d+))\s+(?<year>\([1|2][0-9]{3}\))' . '/u',
 		
+		// Bull. Brit. Mus. Nat. Hist., Bot., 2: 245
+		'/^(?<journal>Bull. Brit. Mus. \(Nat\. Hist\.\), Bot\.),\s+(?<volume>\d+):\s+(?<collation>\d+)/u',
 		
 		// articles
 		'/^' . $journal_simple . $volume_pattern . $collation_pattern . '/u',
@@ -389,6 +391,7 @@ function parse($text, $debug = false)
 		'/^' . $journal_simple . '/u'
 	);
 	
+	
 	if (0)
 	{
 		$patterns = array(
@@ -402,7 +405,7 @@ function parse($text, $debug = false)
 	if (0)
 	{
 		print_r($patterns);	
-		//exit();
+		exit();
 	}
 	
 	$num_patterns = count($patterns);
@@ -444,6 +447,8 @@ function parse($text, $debug = false)
 		
 		for ($i = 0; $i < $num_patterns; $i++)
 		{
+			//echo $patterns[$i] . "\n";
+		
 			if (preg_match($patterns[$i], $text, $matches, PREG_OFFSET_CAPTURE))
 			{
 				$score = round(match_span($text, $matches), 2);	
@@ -460,7 +465,7 @@ function parse($text, $debug = false)
 					}
 				}
 				
-				//echo "pattern $i : score=$score\n";
+				// echo "pattern $i : score=$score\n";
 				
 				if ($score > $obj->score && $match_count >  $obj->match_count)
 				{

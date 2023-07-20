@@ -59,6 +59,31 @@ function match_bhl_title($text, $debug = false)
 				}
 			}
 		}
+		
+		
+		// hard coding
+		if (count($TitleIDs) == 0)
+		{
+			switch ($text)
+			{
+				case 'Bull. Brit. Mus. (Nat. Hist.), Bot.':
+					$TitleIDs[] = 2198;
+					break;
+					
+				case 'Bull. Nat. Hist. Mus. London, Bot.':
+					$TitleIDs[] = 53883;
+					break;
+					
+				case 'Sida':
+					$TitleIDs[] = 8113;
+					break;
+					
+				default:
+					break;
+			}
+		
+		}
+		
 
 	}
 	
@@ -133,7 +158,9 @@ function find_bhl_page_local($doc)
 //----------------------------------------------------------------------------------------
 function find_name_from_citation($name_id, $name_string, $citation, $maxerror = 2)
 {
-	$doc = parse($citation, false);
+	$result = 'NOT PARSED';
+
+	$doc = parse($citation, true);
 	
 	$doc->target = $name_string;
 
@@ -141,12 +168,20 @@ function find_name_from_citation($name_id, $name_string, $citation, $maxerror = 
 
 	if (isset($doc->data->{'container-title'}))
 	{
+		$result = 'PARSED';
+		
 		$bhl_titles = match_bhl_title($doc->data->{'container-title'}, false);
 		if (count($bhl_titles) > 0)
 		{
 			$doc->data->BHLTITLEID = $bhl_titles;
 		}	
 	}
+	else
+	{
+		return $result;		
+	}
+	
+	// print_r($doc);
 
 	// tuple search
 	if (isset($doc->data->BHLTITLEID))
@@ -154,6 +189,14 @@ function find_name_from_citation($name_id, $name_string, $citation, $maxerror = 
 		// BHL page
 		$doc->data = find_bhl_page_local($doc->data);
 	}
+	else
+	{
+		$result = 'NOTITLE';
+		return $result;	
+	}
+	
+	//print_r($doc);
+	
 
 	if (isset($doc->data->text))
 	{
@@ -188,6 +231,8 @@ function find_name_from_citation($name_id, $name_string, $citation, $maxerror = 
 	
 	if (isset($doc->data->BHLPAGEID))
 	{
+		$result = 'NOT FOUND';
+	
 		foreach ($doc->data->BHLPAGEID as $PageID)
 		{
 			if (isset($doc->data->hits))
@@ -236,6 +281,9 @@ function find_name_from_citation($name_id, $name_string, $citation, $maxerror = 
 												
 							echo 'REPLACE INTO annotation(' . join(',', $keys) . ') VALUES (' . join(',', $values) . ');' . "\n";
 
+							//echo $doc->target . "\n";
+
+							$result = 'FOUND';
 
 							/*
 							$terms = array();
@@ -258,14 +306,31 @@ function find_name_from_citation($name_id, $name_string, $citation, $maxerror = 
 		}
 	
 	}
+	
+	return $result;
 }
 
 //----------------------------------------------------------------------------------------
 
 $filename = "test.tsv";
 
+$filename = "2198.tsv";
+$filename = "40366.tsv";
+$filename = "sida.tsv";
+$filename = "895.tsv";
+$filename = "153166.tsv";
+
 $headings = array();
 $row_count = 0;
+
+$show_errors = false;
+//$show_errors = true;
+
+$not_parsed = array();
+$not_found = array();
+
+$try_again = true;
+
 
 $file_handle = fopen($filename, "r");
 while (!feof($file_handle)) 
@@ -294,13 +359,47 @@ while (!feof($file_handle))
 				}
 			}
 			
-			// print_r($obj);	
+			//print_r($obj);	
+			
+			$citation = $obj->publication . ', ' . $obj->collation;
 						
-			find_name_from_citation(
+			$result = find_name_from_citation(
 				$obj->id, 
 				$obj->fullnamewithoutfamilyandauthors,
-				$obj->publication . ' ' . $obj->collation
+				$citation
 				);
+				
+			// need to parse name and see if we can do better
+			if ($result == 'NOT FOUND' && $try_again)
+			{
+				// try abbreviated genus name
+				if (preg_match('/^([A-Z])\w+\s+(\w+)$/', $obj->fullnamewithoutfamilyandauthors, $m))
+				{
+					$result = find_name_from_citation(
+					$obj->id, 
+					$m[1] . '. ' . $m[2],
+					$citation
+					);
+				}
+			}
+				
+			echo "-- $result\n";
+			
+			switch ($result)
+			{
+				case 'NOT PARSED':
+					$not_parsed[] = $citation;
+					break;
+
+				case 'NOT FOUND':
+					$not_found[] = $obj->fullnamewithoutfamilyandauthors . "|" . $citation;
+					break;
+			
+			
+				default:
+					break;
+			
+			}
 
 		}
 	}	
@@ -308,6 +407,11 @@ while (!feof($file_handle))
 	
 }	
 
+if ($show_errors)
+{
+	print_r($not_parsed);
+	print_r($not_found);
+}
 
 
 ?>

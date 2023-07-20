@@ -350,29 +350,69 @@ if (1)
 	}
 	
 	// all for a title
-	$TitleID = 40366; 
-	$basedir = $config['cache'] . '/' . $TitleID;	
-	$files = scandir($basedir);
-
-
-	$deep = false;
-	//$deep = true; // include text and names
 	
-	
+	$titles = array(
+	/*
+895, // Wrightia
+153166, // Richardiana
+8113, // SIDA
+12678, // Phytologia
+889, // North American flora
+44786, // Bull. New York Bot. Gard.
+259, // Leaflets of Philippine botany
+49730, // Bulletin de l'Herbier Boissier
+327, // Revis. Gen. Pl.
+*/
+60, // Bot. Jahrb. Syst.
+626, // Linnaea
+454, // Fl. Bras. (Martius)
+286, // Prodr. (DC.)
+250, // Pflanzenr. (Engler)
+687, // Contr. U.S. Natl. Herb.
+702, // Annals of the Missouri Botanical Garden
+721, // Rhodora
+480, // J. Arnold Arbor.
+64, // Flora
+42246, // Publication. Field Museum of Natural History Botanical series
+744, // Novon
+59986, // Gray Herb
+359, // Bulletin de la Société botanique de France
+276, // Repertorium specierum novarum regni vegetabilis
+15369, // Pittonia
+2087, // Journal of the Washington Academy of Sciences
+16515, // Flora australiensis:
+128759, // Nuytsia
+144, // Symb. Antill. (Urban).
+42247, // Fieldiana, Bot.
+65344, // Madroño
+77306, // The Gardens' bulletin, Singapore
 
-	foreach ($files as $filename)
+);
+	foreach ($titles as $TitleID)
 	{
-		// title
-		if (preg_match('/title-(?<id>\d+)\.json$/', $filename, $m))
-		{	
-			title_to_sql($m['id'], $basedir);
-		}	
+		$basedir = $config['cache'] . '/' . $TitleID;	
+		$files = scandir($basedir);
+
+
+		$deep = false;
+		//$deep = true; // include text and names
+	
+	
+
+		foreach ($files as $filename)
+		{
+			// title
+			if (preg_match('/title-(?<id>\d+)\.json$/', $filename, $m))
+			{	
+				title_to_sql($m['id'], $basedir);
+			}	
 		
-		// item
-		if (preg_match('/item-(?<id>\d+)\.json$/', $filename, $m))
-		{	
-			item_to_sql($m['id'], $deep, $basedir);
-		}			
+			// item
+			if (preg_match('/item-(?<id>\d+)\.json$/', $filename, $m))
+			{	
+				item_to_sql($m['id'], $deep, $basedir);
+			}			
+		}
 	}
 }
  
