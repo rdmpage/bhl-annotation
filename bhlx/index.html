@@ -1,0 +1,22 @@
+<html>
+<head>
+<style>
+body {
+	padding:2em;
+	font-family: sans-serif;
+}
+</style>
+<title>BHL Annotation Bookmarklet</title>
+</head>
+<body>
+<h1>BHL Annotation Bookmarklet</h1>
+
+<p>
+	<a onclick="alert('Please drag this link to your bookmarks bar.'); return false;" href="javascript:(function(a){%20a=document.createElement('script');a.type='text/javascript';a.src='https://bionames.org/bhlx/script.js?x='+Date.now();document.getElementsByTagName('body')[0].appendChild(a);})();">BHL ANNOTATION</a>	
+	<span>← Drag this to your bookmarks bar</span>
+</p>	
+
+<p>When viewing a BHL item click on the <b>BHL ANNOTATION</b> bookmark to see annotations (if any ) on the BHL page. These are updated as you scroll through the viewer. Currently only one example: <a href="https://www.biodiversitylibrary.org/item/322056">v.1:no.1 (1977) - Austrobaileya</a>.
+
+</body>
+</html>
