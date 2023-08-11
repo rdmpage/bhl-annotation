@@ -372,6 +372,13 @@ function parse($text, $debug = false)
 		// Bull. Brit. Mus. Nat. Hist., Bot., 2: 245
 		'/^(?<journal>Bull. Brit. Mus. \(Nat\. Hist\.\), Bot\.),\s+(?<volume>\d+):\s+(?<collation>\d+)/u',
 		
+		// in Fieldiana, Bot., xxviii. No. 2, 318 (1952).
+		'/^(?<journal>(in )?Fieldiana, Bot.),\s+(?<volume>[ivxlcIVXLC0-9]+)[\.|,](\s+(No.\s*)?([ivxlcIVXLC0-9]+)[,|\.])?\s+(?<collation>\d+)/u',
+		
+		// Symb. Antill. (Urban)., 9: 394
+		'/^' . $journal_simple . '\.,\s+' . $volume_pattern . $collation_pattern . '/u',
+		
+		
 		// articles
 		'/^' . $journal_simple . $volume_pattern . $collation_pattern . '/u',
 		'/^' . $journal_simple . '[,|:]' . $volume_pattern . $collation_pattern . '/u',
@@ -389,6 +396,7 @@ function parse($text, $debug = false)
 		
 		// simple pattern
 		'/^' . $journal_simple . '/u'
+		
 	);
 	
 	

@@ -24,6 +24,8 @@ function get_page_number($PageNumbers)
 		$value = $PageNumbers[0]->Number;
 		$value = preg_replace('/Page%/', '', $value);
 		$value = preg_replace('/(Pl\.?(ate)?)%/', '$1 ', $value);
+		
+		$value = preg_replace('/%/', '', $value);
 	}
 		
 	return $value;
@@ -176,7 +178,7 @@ function tuples_to_sql($item_series)
 					// text
 					case 'page_label':
 					case 'sequence_label':
-						$values[] = '"' . $obj->{$k} . '"';
+						$values[] = '"' . str_replace('"', '""', $obj->{$k}) . '"';
 						break;
 
 					// numbers
@@ -226,7 +228,8 @@ if (0)
 	$TitleID = 14688; 
 	$ItemID = 265868;
 	
-	
+	$TitleID = 50489; 
+	$ItemID = 150908;	
 
 	$basedir = $config['cache'] . '/' . $TitleID;
 
@@ -251,7 +254,7 @@ if (0)
 			//tuples_to_sql($item_series);
 		
 		
-			// print_r($item_series);
+			//print_r($item_series);
 			
 		
 			// what are the correspodning series in the metadata?
